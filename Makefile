@@ -11,7 +11,6 @@ NAME = philo
 
 # Source files
 SRCS = main.c \
-       philo.h \
        parsing.c \
        routine.c \
        init.c \
@@ -28,7 +27,7 @@ $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
 # Rule to compile .c files to .o files
-%.o: %.c
+%.o: %.c Philo.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Clean object files

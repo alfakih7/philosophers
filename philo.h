@@ -1,47 +1,63 @@
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/time.h>
+#ifndef PHILO_H
+# define PHILO_H
 
+# include <stdio.h>    // Standard I/O for printing messages.
+# include <stdlib.h>   // Standard library for general functions like malloc and free.
+# include <pthread.h>  // POSIX threads for creating and managing threads.
+# include <unistd.h>   // Unix standard functions like usleep.
+# include <sys/time.h> // Time functions to handle timestamps and time calculations.
+
+# define MAX_PHILOS 200  // Maximum number of philosophers allowed in the simulation.
+
+// Struct for holding all the necessary data for each philosopher.
 typedef struct s_philo
 {
-    pthread_mutex_t *forks;
-    int             right_fork_id;
-    int             left_fork_id;
-    struct s_data   *data;      // Pointer to the main data structure
-    pthread_t       t1;         // Thread identifier for this philosopher
-    int             id;         // Unique identifier for this philosopher
-    int             eat_cont;   // Counter for how many times this philosopher has eaten
-    int             status;     // Current status of the philosopher
-    int             eating;     // Flag to indicate if the philosopher is currently eating
-    uint64_t        time_to_die; // Time left before this philosopher dies if not fed
-    pthread_mutex_t lock;       // Mutex for protecting this philosopher's data
-    pthread_mutex_t *r_fork;    // Pointer to the right fork's mutex
-    pthread_mutex_t *l_fork;    // Pointer to the left fork's mutex
-} t_philo;
+    int             id;          // Philosopher's ID (1-based index).
+    int             eat_cont;    // Count of how many times this philosopher has eaten.
+    int             status;      // Status of the philosopher (e.g., eating, thinking).
+    long long       time_to_die; // Timestamp when the philosopher will die if not fed.
+    pthread_mutex_t *l_fork;     // Pointer to the left fork (mutex).
+    pthread_mutex_t *r_fork;     // Pointer to the right fork (mutex).
+    struct s_data   *data;       // Pointer to the shared data structure.
+}               t_philo;
 
+// Struct for holding all the shared data needed for the simulation.
 typedef struct s_data
 {
-    pthread_t       *tid;       // Array of thread identifiers
-    int             philo_num;  // Total number of philosophers
-    int             meals_nb;   // Number of times each philosopher must eat (if specified)
-    int             dead;       // Flag to indicate if a philosopher has died
-    int             finished;   // Flag to indicate if the simulation has finished
-    t_philo         *philos;    // Array of philosopher structures
-    u_int64_t       death_time; // Time a philosopher can go without eating before dying
-    u_int64_t       eat_time;   // Time it takes for a philosopher to eat
-    u_int64_t       sleep_time; // Time a philosopher spends sleeping
-    u_int64_t       start_time; // Start time of the simulation
-    pthread_mutex_t *forks;     // Array of mutexes for forks
-    pthread_mutex_t lock;       // General mutex for protecting shared data
-    pthread_mutex_t write;      // Mutex for protecting write operations (e.g., printing)
-} t_data;
+    int             philo_num;       // Number of philosophers.
+    long long       death_time;      // Time in milliseconds before a philosopher dies without eating.
+    long long       eat_time;        // Time in milliseconds a philosopher spends eating.
+    long long       sleep_time;      // Time in milliseconds a philosopher spends sleeping.
+    int             meals_nb;        // Number of meals each philosopher must have (or -1 for unlimited).
+    int             dead;            // Flag indicating if a philosopher has died.
+    int             finished;        // Flag indicating if the simulation is finished.
+    long long       start_time;      // Timestamp of when the simulation started.
+    pthread_t       tid[MAX_PHILOS]; // Array of thread identifiers for each philosopher.
+    t_philo         philos[MAX_PHILOS]; // Array of philosopher structures (no dynamic allocation).
+    pthread_mutex_t forks[MAX_PHILOS];  // Array of mutexes representing each fork (no dynamic allocation).
+}               t_data;
 
-int init_data(t_data *data, int argc, char **argv);
-int init_mutexes(t_data *data);
-int init_philos(t_data *data);
-long long ft_atoi(const char *str);
-// void print_status(t_data *data , int id , char *status);
-uint64_t get_time(void);
-void *routine(void *arg);
+// Function prototypes for the various functionalities in the program.
+
+// Function to initialize the main data structure with input arguments.
+int     init_data(t_data *data, int argc, char **argv);
+
+// Function to initialize all the mutexes representing forks.
+int     init_mutexes(t_data *data);
+
+// Function to initialize each philosopher's data.
+int     init_philos(t_data *data);
+
+// The main simulation function that creates threads and starts the routine.
+int     simulation(t_data *data);
+
+// The routine that each philosopher thread executes.
+void    *routine(void *arg);
+
+// Function to get the current time in milliseconds.
+long long   get_time(void);
+
+// A utility function to safely parse integers from strings.
+long long   ft_atoi(const char *str);
+
+#endif

@@ -1,127 +1,89 @@
-// Step 1: Checking the input
-// The first thing we are going to do it checking the input that we recive. As first thing let's take a analyze a standard input that we are going to recive: 5 800 200 200 7
-// 5: is the number of philos
-// 800: is the time a philosopher must fast to die
-// 200: is the time a philosopher takes to eat
-// 200: is the time a philosopher takes to sleep
-// 7: are the times all the philos must eat in or
+#include "philo.h"  // Include the header file that contains necessary function declarations and data structures.
 
+// simulation.c
 #include "philo.h"
 
-// void *philo_routine(void *arg)
-// {
+int simulation(t_data *data)
+{
+    int i;
+    // No need to allocate memory for tid since it's a static array.
+    data->start_time = get_time(); // Get the start time of the simulation.
+    for (i = 0; i < data->philo_num; i++) // Create a thread for each philosopher.
+    {
+        if (pthread_create(&data->tid[i], NULL, routine, &data->philos[i]) != 0)
+            return 1; // Return error if thread creation fails.
+    }
+    
+    for (i = 0; i < data->philo_num; i++) // Join all philosopher threads.
+    {
+        pthread_join(data->tid[i], NULL);
+    }
+    return 0; // Return success.
+}
 
-// }
-
-// int start_simulation(t_data *data)
-// {
-
-// }
-// void assign_forks(t_philo *philo , int num_philos)
-// {
-//     philo->right_fork_id = philo->id;
-//     philo->left_fork_id = (philo->id + 1) % num_philos;
-// }
 
 void *routine(void *arg)
 {
-    // int i = 0;
-    // int fork = i * 2;
-    t_philo *philo = (t_philo *)arg;
-    int right_fork_id = philo->right_fork_id;
-    int left_fork_id = philo->left_fork_id;;
+    t_philo *philo = (t_philo *)arg;  // Cast the argument to a philosopher pointer.
+    int right_fork_id = philo->id - 1;  // Calculate the right fork ID (index).
+    int left_fork_id = philo->id % philo->data->philo_num;  // Calculate the left fork ID (next index, wrapping around).
 
-    while (1)
+    while (1)  // Infinite loop for philosopher routine.
     {
-        pthread_mutex_lock(&philo->forks[right_fork_id]);
-        printf("thread %llu  %d has taken the right fork\n", get_time() ,philo->id);
-        pthread_mutex_unlock(&philo->forks[left_fork_id]);
-        pthread_mutex_lock(&philo->forks[left_fork_id]);
-        printf("thread %d has taken the left fork\n" , philo->id);
-        printf("thread %d is eating\n", philo->id);
-        sleep(1);
-       
-        // pthread_mutex_unlock(&philo->forks[right_fork_id]);
-        printf("threads %d is thinking\n ", philo->id);
-        sleep(1);
-        printf("threads %d is sleeping \n ", philo->id);
-        sleep(1);
+        pthread_mutex_lock(&philo->data->forks[right_fork_id]);  // Lock the right fork.
+        printf("Philosopher %d has taken the right fork\n", philo->id);
+        pthread_mutex_unlock(&philo->data->forks[right_fork_id]);
+
+        pthread_mutex_lock(&philo->data->forks[left_fork_id]);  // Lock the left fork.
+        printf(" %lld Philosopher %d has taken the left fork\n", get_time() ,philo->id);
+        pthread_mutex_unlock(&philo->data->forks[left_fork_id]);
+
+        printf(" %lld Philosopher %d is eating\n", get_time(),philo->id);
+        usleep(philo->data->eat_time * 1000);  // Simulate eating time (in microseconds).
+        // pthread_mutex_unlock(&philo->data->forks[right_fork_id]);  // Unlock the right fork.
+        // pthread_mutex_unlock(&philo->data->forks[left_fork_id]);  // Unlock the left fork.
+
+        printf("Philosopher %d is thinking\n", philo->id);
+        usleep(philo->data->sleep_time * 1000);  // Simulate thinking time (in microseconds).
     }
-    // printf("thread %d has started eating\n" , thread_id);
-    return NULL;
+
+    return NULL;  // Return NULL to indicate the end of the routine.
 }
+
 
 int main(int argc, char **argv)
 {
-    t_data data;
-    if(argc != 5 && argc != 6)
+    t_data data;  // Declare the main data structure that holds all information about the simulation.
+
+    // Check if the number of arguments is correct.
+    if (argc != 5 && argc != 6)
     {
+        // If not, print usage instructions and exit.
         printf("Usage: ./philo number_of_philosophers time_to_die time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]\n");
         return (1);
     }
-    if(init_data(&data , argc , argv))
-        return 1;
-    if(init_mutexes(&data))
-        return 1;
-    if(init_philos(&data))
-        return 1;
-    if(start_simulation(&data))
-        return 1;
-    // (void)argc;
-    // int num_philosphers;
-    // int i;
-    // i = 0;
+    
+    // Initialize the data structure with command line arguments.
+    if (init_data(&data, argc, argv))
+        return 1;  // Return 1 if initialization fails.
 
-    // num_philosphers = atoi(argv[1]);
-    // pthread_t th[num_philosphers];
-    // t_philo philosophers[num_philosphers];
-    // t_data data;
-    // data.philo_num = num_philosphers;
-    // data.forks = malloc(sizeof(pthread_mutex_t) * num_philosphers);
-    // // pthread_mutex_t forks[num_philosphers];
+    // Initialize the mutexes for the forks.
+    if (init_mutexes(&data))
+        return 1;  // Return 1 if mutex initialization fails.
 
-    // while (i < num_philosphers)
-    // {
-    //     if (pthread_mutex_init(&data.forks[i], NULL) != 0)
-    //     {
-    //         perror("failed to init the mutexes");
-    //         return 1;
-    //     }
-    //     i++;
-    // }
-    // i = 0;
-    // while (i < num_philosphers)
-    // {
-    //     philosophers[i].id = i;
-    //     philosophers[i].forks = data.forks;
-    //     philosophers[i].left_fork_id = i;
-    //     philosophers[i].right_fork_id = (i + 1) % num_philosphers;
-    //     philosophers[i].forks = data.forks;
-    //     philosophers[i].data = &data;
-    //     if (pthread_create(&th[i], NULL, &routine, &philosophers[i]) != 0)
-    //     {
-    //         perror("failed to create a thread");
-    //         return 1;
-    //     }
-    //     // printf("thread %d started eating\n" , i);
-    //     i++;
-    // }
-    // i = 0;
-    // while (i < num_philosphers)
-    // {
-    //     if (pthread_join(th[i], NULL) != 0)
-    //     {
-    //         return 2;
-    //     }
-    //     // pthread_mutex_unlock(&mutex);
-    //     i++;
-    // }
-    // i = 0;
-    // while (i < num_philosphers)
-    // {
-    //     pthread_mutex_destroy(&data.forks[i]);
-    //     i++;
-    // }
-    // free(data.forks);
-    return(0);
+    // Initialize the philosophers.
+    if (init_philos(&data))
+        return 1;  // Return 1 if philosopher initialization fails.
+
+    // Start the simulation.
+    if (simulation(&data))
+        return 1;  // Return 1 if the simulation fails.
+
+    // Destroy each mutex after the simulation ends to release resources.
+    for (int i = 0; i < data.philo_num; i++)
+    {
+        pthread_mutex_destroy(&data.forks[i]);  // Destroy each mutex.
+    }
+
+    return 0;  // Return 0 to indicate the program finished successfully.
 }
