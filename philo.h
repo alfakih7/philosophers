@@ -15,6 +15,7 @@ typedef struct s_philo
     int             id;          // Philosopher's ID (1-based index).
     int             eat_cont;    // Count of how many times this philosopher has eaten.
     int             status;      // Status of the philosopher (e.g., eating, thinking).
+    long long last_meal_time; 
     long long       time_to_die; // Timestamp when the philosopher will die if not fed.
     pthread_mutex_t *l_fork;     // Pointer to the left fork (mutex).
     pthread_mutex_t *r_fork;     // Pointer to the right fork (mutex).
@@ -60,4 +61,5 @@ long long   get_time(void);
 // A utility function to safely parse integers from strings.
 long long   ft_atoi(const char *str);
 
+int	ft_usleep(size_t milliseconds);
 #endif
