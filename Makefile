@@ -12,7 +12,7 @@ NAME = philo
 # Source files
 SRCS = main.c \
        parsing.c \
-       routine.c \
+       routine_utils.c \
        init.c \
        utils.c
 

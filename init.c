@@ -2,6 +2,8 @@
 
 int init_data(t_data *data, int argc, char **argv)
 {
+    int i;
+    i = 0;
     data->philo_num = ft_atoi(argv[1]);
     data->death_time = ft_atoi(argv[2]);
     data->eat_time = ft_atoi(argv[3]);
@@ -12,8 +14,13 @@ int init_data(t_data *data, int argc, char **argv)
     else
         data->meals_nb = -1;
 
-    data->dead = 0;
+    data->is_dead = 0;
     data->finished = 0;
+    while(i < data->philo_num)
+    {
+        data->fforks[i] = 0;
+        i++;
+    }
     return 0;
 }
 
