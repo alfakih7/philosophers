@@ -4,7 +4,8 @@
 CC = gcc
 
 # Compiler flags
-CFLAGS = -Wall -Wextra -Werror -pthread
+CFLAGS = -Wall -Wextra -Werror -fsanitize=thread -g3 
+# -fsanitize=thread
 
 # Name of the executable
 NAME = philo
@@ -14,7 +15,8 @@ SRCS = main.c \
        parsing.c \
        routine_utils.c \
        init.c \
-       utils.c
+       utils.c \
+	   eat.c
 
 # Object files
 OBJS = $(SRCS:.c=.o)

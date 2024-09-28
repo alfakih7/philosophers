@@ -13,7 +13,9 @@ int init_data(t_data *data, int argc, char **argv)
         data->meals_nb = ft_atoi(argv[5]);
     else
         data->meals_nb = -1;
-
+    data->should_stop = 0;
+    if(pthread_mutex_init(&data->stop_mutex , NULL) != 0)
+        return 1;
     data->is_dead = 0;
     data->finished = 0;
     while(i < data->philo_num)

@@ -1,9 +1,15 @@
 #include "philo.h"
 
+
 int simulation(t_data *data)
 {
     int i;
+    pthread_t monitor_tid;
+
     data->start_time = get_time();
+    data->should_stop = 0;
+    
+
     i = 0;
     while (i < data->philo_num)
     {
@@ -11,30 +17,23 @@ int simulation(t_data *data)
             return 1;
         i++;
     }
+    
+    if (pthread_create(&monitor_tid, NULL, monitor_routine, data) != 0)
+        return 1;
+
+    pthread_join(monitor_tid, NULL);
+
+    pthread_mutex_lock(&data->stop_mutex);
+    data->should_stop = 1;
+    pthread_mutex_unlock(&data->stop_mutex);
     i = 0;
     while (i < data->philo_num)
     {
         pthread_join(data->tid[i], NULL);
         i++;
     }
-    return 0;
-}
 
-void is_dead(t_philo *philo)
-{
-    pthread_mutex_lock(&philo->data->isdead_mutex);
-    if (get_time() - philo->last_meal_time >= philo->data->death_time && philo->data->is_dead == 0)
-    {
-        printf("h\n");
-        pthread_mutex_lock(&philo->data->print_mutex);
-        printf("\033[31m[%lld ms] 😵 Philosopher %d has died! 💀\033[0m\n", (get_time() - philo->start), philo->id);
-        pthread_mutex_unlock(&philo->data->print_mutex);
-        pthread_mutex_unlock(&philo->data->isdead_mutex);
-        philo->data->is_dead = 1;
-        exit(0);
-    }
-    pthread_mutex_unlock(&philo->data->isdead_mutex);
-   
+    return 0;
 }
 
 void *routine(void *arg)
@@ -46,65 +45,26 @@ void *routine(void *arg)
 
     while (1)
     {
+        pthread_mutex_lock(&philo->data->stop_mutex);
+        if (philo->data->should_stop)
+        {
+            pthread_mutex_unlock(&philo->data->stop_mutex);
+            break;
+        }
+        pthread_mutex_unlock(&philo->data->stop_mutex);
 
-        if(philo->data->philo_num == 1)
+        if (philo->data->philo_num == 1)
         {
-            printf("\033[33m[%lld ms] 💪 Philosopher %d has taken the right fork! 🥄\033[0m\n", (get_time() - philo->start), philo->id);
+            print_status(philo, "has taken the right fork", "\033[33m");
             ft_usleep(philo->data->death_time, philo);
-            printf("\033[31m[%lld ms] 😵 Philosopher %d has died! 💀\033[0m\n", (get_time() - philo->start), philo->id);
-            exit(1);
+            break;
         }
-        pthread_mutex_lock(&philo->data->forks[right_fork_id]);
-        pthread_mutex_lock(&philo->data->forks[left_fork_id]);
-        if(philo->data->fforks[left_fork_id] == 0 && philo->data->fforks[right_fork_id] == 0)
+
+        if (try_to_eat(philo, right_fork_id, left_fork_id))
         {
-            is_dead(philo);
-            pthread_mutex_lock(&philo->data->print_mutex);
-            printf("\033[33m[%lld ms] 💪 Philosopher %d has taken the right fork! 🥄\033[0m\n", (get_time() - philo->start), philo->id);
-            pthread_mutex_unlock(&philo->data->print_mutex);
-            is_dead(philo);
-            philo->data->fforks[right_fork_id] = 1;
-            pthread_mutex_lock(&philo->data->print_mutex);
-            printf("👐 \033[31m[%lld ms]\033[0m Philosopher %d has taken the left fork! 🥄\n", (get_time() - philo->start), philo->id);
-            pthread_mutex_unlock(&philo->data->print_mutex);
-            is_dead(philo);
-            philo->data->fforks[left_fork_id] = 1;
-            pthread_mutex_lock(&philo->data->print_mutex);
-            printf("🍽️ \033[32m[%lld ms]\033[0m Philosopher %d is eating! 😋\n", (get_time() - philo->start), philo->id);
-            pthread_mutex_unlock(&philo->data->print_mutex);
-            is_dead(philo);
-            pthread_mutex_unlock(&philo->data->forks[right_fork_id]);
-            pthread_mutex_unlock(&philo->data->forks[left_fork_id]);
-            ft_usleep(philo->data->eat_time, philo);
-            philo->last_meal_time = get_time();
-            pthread_mutex_lock(&philo->data->forks[right_fork_id]);
-            pthread_mutex_lock(&philo->data->forks[left_fork_id]);
-            philo->data->fforks[right_fork_id] = 0;
-            philo->data->fforks[left_fork_id] = 0;
-            philo->eat_cont++;
-            if (philo->eat_cont == philo->data->meals_nb)
-            {
-                printf("Philosopher %d has eaten %d times.\n", philo->id, philo->eat_cont);
-                pthread_mutex_unlock(&philo->data->forks[right_fork_id]);
-                pthread_mutex_unlock(&philo->data->forks[left_fork_id]);
-                exit(1);
-            }
-            pthread_mutex_unlock(&philo->data->forks[right_fork_id]);
-            pthread_mutex_unlock(&philo->data->forks[left_fork_id]);
-            is_dead(philo);    
-            pthread_mutex_lock(&philo->data->print_mutex);
-            printf("😴 \033[33m[%lld ms]\033[0m Philosopher %d is sleeping... 💤\n", (get_time() - philo->start), philo->id);
-            pthread_mutex_unlock(&philo->data->print_mutex);
-            is_dead(philo);
-            ft_usleep(philo->data->sleep_time , philo);
-            pthread_mutex_lock(&philo->data->print_mutex);
-            printf("🤔 \033[34m[%lld ms]\033[0m Philosopher %d is thinking... 💭\n", (get_time() - philo->start), philo->id);
-            pthread_mutex_unlock(&philo->data->print_mutex);
-        }
-        else
-        {
-            pthread_mutex_unlock(&philo->data->forks[right_fork_id]);
-            pthread_mutex_unlock(&philo->data->forks[left_fork_id]);
+            print_status(philo, "is sleeping", "\033[33m");
+            ft_usleep(philo->data->sleep_time, philo);
+            print_status(philo, "is thinking", "\033[34m");
         }
     }
 

@@ -18,12 +18,15 @@ typedef struct s_philo
     long long last_meal_time; 
     long long       time_to_die;
     pthread_mutex_t *l_fork;    
-    pthread_mutex_t *r_fork;    
+    pthread_mutex_t *r_fork;   
     struct s_data   *data;
 }               t_philo;
 
 typedef struct s_data
 {
+    int should_stop;
+    pthread_mutex_t stop_mutex;
+    pthread_mutex_t num_mutex;
     pthread_mutex_t     isdead_mutex;
     pthread_mutex_t print_mutex;
     int             fforks[200];
@@ -47,7 +50,7 @@ void    *routine(void *arg);
 long long   get_time(void);
 long long   ft_atoi(const char *str);
 int	ft_usleep(size_t milliseconds , t_philo *philo);
-void is_dead(t_philo *philo);
+// void is_dead(t_philo *philo);
 void *monitor_routine(void *arg);
 void print_status(t_philo *philo, const char *status, const char *color);
 int try_to_eat(t_philo *philo, int right_fork_id, int left_fork_id);
