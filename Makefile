@@ -1,11 +1,12 @@
 # Makefile for philo project
 
 # Compiler
-CC = gcc
+CC = cc
 
 # Compiler flags
-CFLAGS = -Wall -Wextra -Werror -fsanitize=thread -g3 
-# -fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=thread
+# CFLAGS = -Wall -Wextra -Werror
+
 
 # Name of the executable
 NAME = philo
@@ -16,7 +17,9 @@ SRCS = main.c \
        routine_utils.c \
        init.c \
        utils.c \
-	   eat.c
+	   eat.c \
+	   routine.c \
+	   simulation.c
 
 # Object files
 OBJS = $(SRCS:.c=.o)
@@ -26,7 +29,7 @@ all: $(NAME)
 
 # Rule to create the executable
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) -lpthread
 
 # Rule to compile .c files to .o files
 %.o: %.c Philo.h

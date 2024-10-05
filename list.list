@@ -1,0 +1,8 @@
+╰─ ./philo 50000 500 200 200                                                                                                                                                                                                                                            ─╯
+init.c:27:9: runtime error: index 200 out of bounds for type 'int [200]'
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior init.c:27:9 in 
+
+./philo 3 5000 200 200 10  
+// hangs, possible deadlock
+
+ ./philo 3 5000 -1 200 -1  

@@ -6,7 +6,7 @@
 /*   By: almohame <almohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/15 22:56:20 by almohame          #+#    #+#             */
-/*   Updated: 2024/09/27 19:58:07 by almohame         ###   ########.fr       */
+/*   Updated: 2024/10/05 09:41:45 by almohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,17 @@ int ft_usleep(size_t milliseconds, t_philo *philo)
     start = get_time();
     while ((get_time() - start) < milliseconds)
     {
-         // check if dead or not 
-        if (philo->data->is_dead)
+        // pthread_mutex_lock(&philo->data->stop_mutex);
+        // if (philo->data->should_stop)
+        // {
+        //     pthread_mutex_unlock(&philo->data->stop_mutex);
+        //     return (1);
+        //  }
+        // pthread_mutex_unlock(&philo->data->stop_mutex);
+        usleep(250);
+        if (check_philosopher_death(philo))
             return (1);
-        usleep(500);
     }
     return (0);
 }
+
