@@ -31,7 +31,7 @@ static void	update_meal_count(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->data->meals_eaten_mutex);
 	philo->data->philos_finished_eating++;
-	if (philo->data->philos_finished_eating == philo->data->philo_num)
+	if (philo->data->philos_finished_eating == philo->philo_num)
 	{
 		pthread_mutex_lock(&philo->data->stop_mutex);
 		philo->data->should_stop = 1;
@@ -42,21 +42,24 @@ static void	update_meal_count(t_philo *philo)
 
 static void	perform_eating(t_philo *philo)
 {
-	print_status(philo, "has taken the right fork", "\033[33m");
-	print_status(philo, "has taken the left fork", "\033[31m");
-	print_status(philo, "is eating", "\033[32m");
-	pthread_mutex_lock(&philo->meal_mutex);
-	philo->last_meal_time = get_time();
-	pthread_mutex_unlock(&philo->meal_mutex);
-	ft_usleep(philo->data->eat_time, philo);
-	philo->eat_cont++;
-	if (philo->data->meals_nb != -1 && philo->eat_cont == philo->data->meals_nb)
+	if (philo->eat_cont != philo->meals_nb)
 	{
-		pthread_mutex_lock(&philo->data->print_mutex);
-		printf("\033[35mPhilosopher %d has eaten %d times.\033[0m\n",
-			philo->id, philo->eat_cont);
-		pthread_mutex_unlock(&philo->data->print_mutex);
-		update_meal_count(philo);
+		print_status(philo, "has taken the right fork", "\033[33m");
+		print_status(philo, "has taken the left fork", "\033[31m");
+		print_status(philo, "is eating", "\033[32m");
+		pthread_mutex_lock(&philo->meal_mutex);
+		philo->last_meal_time = get_time();
+		pthread_mutex_unlock(&philo->meal_mutex);
+		ft_usleep(philo->data->eat_time, philo);
+		philo->eat_cont++;
+		if (philo->meals_nb != -1 && philo->eat_cont == philo->meals_nb)
+		{
+			pthread_mutex_lock(&philo->data->print_mutex);
+			printf("\033[35mPhilosopher %d has eaten %d times.\033[0m\n",
+				philo->id, philo->eat_cont);
+			pthread_mutex_unlock(&philo->data->print_mutex);
+			update_meal_count(philo);
+		}
 	}
 }
 

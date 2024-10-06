@@ -60,7 +60,7 @@ void	*monitor_routine(void *arg)
 		}
 		if (check_stop_condition(data))
 			return (NULL);
-		usleep(1000);
+		usleep(100);
 	}
 }
 

@@ -77,6 +77,8 @@ int	init_philos(t_data *data)
 		data->philos[i].death_time = data->death_time;
 		data->philos[i].eat_time = data->eat_time;
 		data->philos[i].sleep_time = data->sleep_time;
+		data->philos[i].meals_nb = data->meals_nb;
+		data->philos[i].philo_num = data->philo_num;
 		if (pthread_mutex_init(&data->philos[i].meal_mutex, NULL) != 0)
 			return (1);
 		i++;

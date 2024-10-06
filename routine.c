@@ -39,9 +39,7 @@ void	*routine(void *arg)
 	philo = (t_philo *)arg;
 	philo->start = get_time();
 	right_fork_id = philo->id - 1;
-	// pthread_mutex_lock(&philo->data->num_mutex);
 	left_fork_id = philo->id % philo->data->philo_num;
-	// pthread_mutex_unlock(&philo->data->num_mutex);
 	while (1)
 	{
 		pthread_mutex_lock(&philo->data->stop_mutex);
@@ -51,10 +49,8 @@ void	*routine(void *arg)
 			break ;
 		}
 		pthread_mutex_unlock(&philo->data->stop_mutex);
-		// pthread_mutex_lock(&philo->data->num_mutex);
 		if (philo->data->philo_num == 1 && handle_single_philo(philo))
 			break ;
-		// pthread_mutex_unlock(&philo->data->num_mutex);
 		philosopher_actions(philo, right_fork_id, left_fork_id);
 	}
 	return (NULL);
