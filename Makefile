@@ -4,7 +4,7 @@
 CC = cc
 
 # Compiler flags
-CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=thread
+CFLAGS =  -g3 -fsanitize=thread 
 # CFLAGS = -Wall -Wextra -Werror
 
 

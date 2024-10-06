@@ -6,7 +6,7 @@
 /*   By: almohame <almohame@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 19:14:30 by almohame          #+#    #+#             */
-/*   Updated: 2024/10/05 10:20:35 by almohame         ###   ########.fr       */
+/*   Updated: 2024/10/06 15:36:22 by almohame         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static void	update_meal_count(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->data->meals_eaten_mutex);
 	philo->data->philos_finished_eating++;
-	if (philo->data->philos_finished_eating == philo->philo_num)
+	if (philo->data->philos_finished_eating == philo->data->philo_num)
 	{
 		pthread_mutex_lock(&philo->data->stop_mutex);
 		philo->data->should_stop = 1;
@@ -45,10 +45,12 @@ static void	perform_eating(t_philo *philo)
 	print_status(philo, "has taken the right fork", "\033[33m");
 	print_status(philo, "has taken the left fork", "\033[31m");
 	print_status(philo, "is eating", "\033[32m");
+	pthread_mutex_lock(&philo->meal_mutex);
 	philo->last_meal_time = get_time();
-	ft_usleep(philo->eat_time, philo);
+	pthread_mutex_unlock(&philo->meal_mutex);
+	ft_usleep(philo->data->eat_time, philo);
 	philo->eat_cont++;
-	if (philo->meals_nb != -1 && philo->eat_cont == philo->meals_nb)
+	if (philo->data->meals_nb != -1 && philo->eat_cont == philo->data->meals_nb)
 	{
 		pthread_mutex_lock(&philo->data->print_mutex);
 		printf("\033[35mPhilosopher %d has eaten %d times.\033[0m\n",
@@ -60,22 +62,8 @@ static void	perform_eating(t_philo *philo)
 
 int	try_to_eat(t_philo *philo, int right_fork_id, int left_fork_id)
 {
-    // pthread_mutex_lock(&philo->data->print_mutex);
-    // printf("%lld, id %d, left %d, right %d\n", get_time(), philo->id, left_fork_id, right_fork_id);
-    // pthread_mutex_unlock(&philo->data->print_mutex);
-	// if (philo->id % 2)
-	// {
-	// 	pthread_mutex_lock(&philo->data->forks[left_fork_id]);
-	// 	pthread_mutex_lock(&philo->data->forks[right_fork_id]);
-	// }
-	// else
-	// {
-	// 	pthread_mutex_lock(&philo->data->forks[right_fork_id]);
-	// 	pthread_mutex_lock(&philo->data->forks[left_fork_id]);
-	// }
-	// check_philosopher_death(philo);
-	pthread_mutex_lock(&philo->data->forks[left_fork_id]);
 	pthread_mutex_lock(&philo->data->forks[right_fork_id]);
+	pthread_mutex_lock(&philo->data->forks[left_fork_id]);
 	if (check_stop_condition(philo, right_fork_id, left_fork_id))
 		return (0);
 	if (philo->data->fforks[left_fork_id] == 0

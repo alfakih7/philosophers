@@ -1,0 +1,43 @@
+[0 ms] Philosopher 1 is eating
+[0 ms] Philosopher 3 is eating
+[198 ms] Philosopher 5 is eating
+[201 ms] Philosopher 2 is eating
+[399 ms] Philosopher 4 is eating
+
+[401 ms] Philosopher 1 is eating
+[599 ms] Philosopher 3 is eating
+[599 ms] Philosopher 5 is eating
+[800 ms] Philosopher 2 is eating
+[800 ms] Philosopher 4 is eating
+
+[1000 ms] Philosopher 1 is eating
+[1000 ms] Philosopher 3 is eating
+[1198 ms] Philosopher 5 is eating
+[1201 ms] Philosopher 2 is eating
+[1399 ms] Philosopher 4 is eating
+
+[1401 ms] Philosopher 1 is eating
+[1599 ms] Philosopher 3 is eating
+[1599 ms] Philosopher 5 is eating
+[1800 ms] Philosopher 2 is eating
+[1800 ms] Philosopher 4 is eating
+
+[2000 ms] Philosopher 1 is eating
+[2000 ms] Philosopher 3 is eating
+[2198 ms] Philosopher 5 is eating
+[2201 ms] Philosopher 2 is eating
+[2399 ms] Philosopher 4 is eating
+
+[2401 ms] Philosopher 1 is eating
+[2599 ms] Philosopher 3 is eating
+[2599 ms] Philosopher 5 is eating
+[2800 ms] Philosopher 2 is eating
+[2800 ms] Philosopher 4 is eating
+
+[3000 ms] Philosopher 1 is eating
+[3000 ms] Philosopher 3 is eating
+[3198 ms] Philosopher 5 is eating
+[3201 ms] Philosopher 2 is eating
+[3399 ms] Philosopher 4 is eating
+
+[3401 ms] Philosopher 1 is eating
