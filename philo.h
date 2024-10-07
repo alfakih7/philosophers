@@ -44,6 +44,7 @@ typedef struct s_data
 	int				philos_finished_eating;
 	int				should_stop;
 	pthread_mutex_t	stop_mutex;
+	long			start;
 	pthread_mutex_t	isdead_mutex;
 	pthread_mutex_t	print_mutex;
 	int				fforks[200];

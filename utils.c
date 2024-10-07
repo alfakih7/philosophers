@@ -29,7 +29,7 @@ int	ft_usleep(size_t milliseconds, t_philo *philo)
 	end = start + milliseconds;
 	while (get_time() < end)
 	{
-		usleep(500);
+		usleep(250);
 	}
 	return (0);
 }

@@ -54,9 +54,6 @@ int	init_mutexes(t_data *data)
 	if (pthread_mutex_init(&data->meals_eaten_mutex, NULL) != 0)
 		return (1);
 	return (0);
-	if (pthread_mutex_init(&data->meals_eaten_mutex, NULL) != 0)
-		return (1);
-	return (0);
 }
 
 int	init_philos(t_data *data)
@@ -64,6 +61,7 @@ int	init_philos(t_data *data)
 	int	i;
 
 	i = 0;
+	data->start = get_time();
 	while (i < data->philo_num)
 	{
 		data->philos[i].data = data;
@@ -79,6 +77,7 @@ int	init_philos(t_data *data)
 		data->philos[i].sleep_time = data->sleep_time;
 		data->philos[i].meals_nb = data->meals_nb;
 		data->philos[i].philo_num = data->philo_num;
+		data->philos[i].start = data->start;
 		if (pthread_mutex_init(&data->philos[i].meal_mutex, NULL) != 0)
 			return (1);
 		i++;

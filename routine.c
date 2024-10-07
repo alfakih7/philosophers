@@ -30,6 +30,18 @@ static void	philosopher_actions(t_philo *philo, int right_fork_id,
 	}
 }
 
+static int	check(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->data->stop_mutex);
+	if (philo->data->should_stop)
+	{
+		pthread_mutex_unlock(&philo->data->stop_mutex);
+		return (0);
+	}
+	pthread_mutex_unlock(&philo->data->stop_mutex);
+	return (1);
+}
+
 void	*routine(void *arg)
 {
 	t_philo	*philo;
@@ -37,21 +49,20 @@ void	*routine(void *arg)
 	int		left_fork_id;
 
 	philo = (t_philo *)arg;
-	philo->start = get_time();
 	right_fork_id = philo->id - 1;
 	left_fork_id = philo->id % philo->data->philo_num;
+	if (philo->id % 2 == 0)
+		usleep(1000);
 	while (1)
 	{
-		pthread_mutex_lock(&philo->data->stop_mutex);
-		if (philo->data->should_stop)
-		{
-			pthread_mutex_unlock(&philo->data->stop_mutex);
+		try_to_eat(philo, left_fork_id, right_fork_id);
+		if (!check(philo))
 			break ;
-		}
-		pthread_mutex_unlock(&philo->data->stop_mutex);
 		if (philo->data->philo_num == 1 && handle_single_philo(philo))
 			break ;
-		philosopher_actions(philo, right_fork_id, left_fork_id);
+		print_status(philo, "is sleeping", "\033[33m");
+		ft_usleep(philo->data->sleep_time, philo);
+		print_status(philo, "is thinking", "\033[34m");
 	}
 	return (NULL);
 }

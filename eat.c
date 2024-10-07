@@ -63,25 +63,29 @@ static void	perform_eating(t_philo *philo)
 	}
 }
 
-int	try_to_eat(t_philo *philo, int right_fork_id, int left_fork_id)
+int	try_to_eat(t_philo *philo, int first_fork_id, int second_fork_id)
 {
-	pthread_mutex_lock(&philo->data->forks[right_fork_id]);
-	pthread_mutex_lock(&philo->data->forks[left_fork_id]);
-	if (check_stop_condition(philo, right_fork_id, left_fork_id))
-		return (0);
-	if (philo->data->fforks[left_fork_id] == 0
-		&& philo->data->fforks[right_fork_id] == 0)
+	pthread_mutex_lock(&philo->data->forks[first_fork_id]);
+	if (philo->data->fforks[first_fork_id] == 1)
 	{
-		philo->data->fforks[right_fork_id] = 1;
-		philo->data->fforks[left_fork_id] = 1;
-		perform_eating(philo);
-		philo->data->fforks[right_fork_id] = 0;
-		philo->data->fforks[left_fork_id] = 0;
-		pthread_mutex_unlock(&philo->data->forks[right_fork_id]);
-		pthread_mutex_unlock(&philo->data->forks[left_fork_id]);
-		return (1);
+		pthread_mutex_unlock(&philo->data->forks[first_fork_id]);
+		return (0);
 	}
-	pthread_mutex_unlock(&philo->data->forks[right_fork_id]);
-	pthread_mutex_unlock(&philo->data->forks[left_fork_id]);
-	return (0);
+	pthread_mutex_lock(&philo->data->forks[second_fork_id]);
+	if (philo->data->fforks[second_fork_id] == 1)
+	{
+		pthread_mutex_unlock(&philo->data->forks[first_fork_id]);
+		pthread_mutex_unlock(&philo->data->forks[second_fork_id]);
+		return (0);
+	}
+	if (check_stop_condition(philo, first_fork_id, second_fork_id))
+		return (0);
+	philo->data->fforks[first_fork_id] = 1;
+	philo->data->fforks[second_fork_id] = 1;
+	perform_eating(philo);
+	philo->data->fforks[first_fork_id] = 0;
+	philo->data->fforks[second_fork_id] = 0;
+	pthread_mutex_unlock(&philo->data->forks[first_fork_id]);
+	pthread_mutex_unlock(&philo->data->forks[second_fork_id]);
+	return (1);
 }
